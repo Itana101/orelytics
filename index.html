@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="Mining Economics Intelligence — an interactive educational dashboard for exploring commodity scenarios, mine economics, and project risk.">
+  <title>Orelytics | Mining Economics Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="Orelytics home">
+        <span class="brand-mark">O<span>+</span></span>
+        <span><strong>ORELYTICS</strong><small>MINING INTELLIGENCE</small></span>
+      </a>
+      <div class="workspace-label">WORKSPACE</div>
+      <nav class="nav">
+        <a class="nav-item active" href="#overview"><span class="nav-icon">◫</span> Overview <span class="nav-dot"></span></a>
+        <a class="nav-item" href="#commodities"><span class="nav-icon">⌁</span> Commodity lab</a>
+        <a class="nav-item" href="#simulator"><span class="nav-icon">◈</span> Mine simulator</a>
+        <a class="nav-item" href="#risk"><span class="nav-icon">◎</span> Risk explorer</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="side-card">
+          <span class="side-card-icon">✳</span>
+          <strong>Learn by testing</strong>
+          <p>Change assumptions. See how small market shifts can reshape a mine's economics.</p>
+        </div>
+        <div class="profile">
+          <div class="avatar">MI</div>
+          <div><strong>Mining Insights</strong><small>Educational workspace</small></div>
+          <span class="profile-more">•••</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="breadcrumbs">Workspace <span>/</span> <b>Overview</b></div>
+        <div class="top-actions">
+          <span class="live-badge"><i></i> DEMO ENVIRONMENT</span>
+          <button class="icon-button" id="exportBtn" title="Export scenario as CSV" aria-label="Export scenario as CSV">⇩</button>
+          <button class="user-button" title="Demo profile">MI</button>
+        </div>
+      </header>
+
+      <section class="hero" id="overview">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-line"></span> DECISIONS BELOW THE SURFACE</div>
+          <h1>Make the numbers<br><em>tell the story.</em></h1>
+          <p>Explore the relationship between commodity markets, operating costs, production, and mine profitability — all in one interactive workspace.</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#simulator">Open mine simulator <span>↗</span></a>
+            <a class="text-button" href="#commodities">Explore market data <span>↓</span></a>
+          </div>
+        </div>
+        <div class="hero-visual" aria-label="Abstract mine contour illustration">
+          <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit orbit-three"></div>
+          <div class="ore-core"><span>Au</span><small>ORE<br>INTELLIGENCE</small></div>
+          <div class="float-tag tag-top"><span class="tag-dot gold"></span> VALUE / TONNE <b id="heroValue">$84.20</b></div>
+          <div class="float-tag tag-bottom"><span class="tag-dot green"></span> SCENARIO STATUS <b>Interactive</b></div>
+          <div class="visual-grid"></div>
+        </div>
+      </section>
+
+      <section class="section-heading" id="commodities">
+        <div><div class="eyebrow">01 / MARKET SNAPSHOT</div><h2>Commodity lab</h2><p class="section-subtitle">Illustrative reference prices, not live market quotes.</p></div>
+        <div class="period-switch" role="group" aria-label="Select period"><button class="period active" data-period="30">30D</button><button class="period" data-period="90">90D</button><button class="period" data-period="180">180D</button></div>
+      </section>
+
+      <section class="commodity-grid">
+        <article class="commodity-card featured">
+          <div class="card-top"><span class="commodity-symbol gold-symbol">Au</span><span class="trend up">↗ 4.8%</span></div>
+          <div class="commodity-name">Gold <span>USD / troy oz</span></div>
+          <div class="commodity-price" id="goldPrice">$2,340.00</div>
+          <div class="sparkline-wrap"><svg class="sparkline" id="goldSpark" viewBox="0 0 320 66" preserveAspectRatio="none" aria-label="Illustrative gold price trend"></svg></div>
+          <div class="card-foot"><span>DEMO SERIES</span><span id="goldRange">30-day view</span></div>
+        </article>
+        <article class="commodity-card">
+          <div class="card-top"><span class="commodity-symbol copper-symbol">Cu</span><span class="trend up">↗ 2.1%</span></div>
+          <div class="commodity-name">Copper <span>USD / tonne</span></div>
+          <div class="commodity-price" id="copperPrice">$9,180.00</div>
+          <div class="sparkline-wrap"><svg class="sparkline copper-line" id="copperSpark" viewBox="0 0 320 66" preserveAspectRatio="none" aria-label="Illustrative copper price trend"></svg></div>
+          <div class="card-foot"><span>DEMO SERIES</span><span id="copperRange">30-day view</span></div>
+        </article>
+        <article class="commodity-card">
+          <div class="card-top"><span class="commodity-symbol coal-symbol">Fe</span><span class="trend down">↘ 1.3%</span></div>
+          <div class="commodity-name">Iron ore <span>USD / tonne</span></div>
+          <div class="commodity-price" id="ironPrice">$108.50</div>
+          <div class="sparkline-wrap"><svg class="sparkline iron-line" id="ironSpark" viewBox="0 0 320 66" preserveAspectRatio="none" aria-label="Illustrative iron ore price trend"></svg></div>
+          <div class="card-foot"><span>DEMO SERIES</span><span id="ironRange">30-day view</span></div>
+        </article>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="panel chart-panel">
+          <div class="panel-heading"><div><div class="eyebrow">MARKET MOVEMENT</div><h3>Price path explorer</h3></div><span class="mini-chip">SYNTHETIC DATA</span></div>
+          <div class="chart-legend"><span><i class="legend-dot gold-bg"></i> Gold</span><span><i class="legend-dot copper-bg"></i> Copper (scaled)</span></div>
+          <div class="big-chart-wrap"><svg id="marketChart" viewBox="0 0 720 230" preserveAspectRatio="none" aria-label="Illustrative normalized commodity trends"></svg></div>
+          <div class="chart-axis"><span>Start of period</span><span>Relative index (start = 100)</span><span>Today</span></div>
+        </article>
+        <article class="panel insight-panel">
+          <div class="panel-heading"><div><div class="eyebrow">QUICK INSIGHT</div><h3>What moves profit?</h3></div><span class="spark-icon">✳</span></div>
+          <div class="insight-number">3 <small>core levers</small></div>
+          <div class="lever"><div class="lever-icon revenue">↗</div><div><strong>Realized price</strong><p>Higher selling prices can increase revenue, assuming volume and other factors stay constant.</p></div></div>
+          <div class="lever"><div class="lever-icon cost">⌁</div><div><strong>Unit operating cost</strong><p>Energy, labor, consumables, and logistics all influence cost per tonne.</p></div></div>
+          <div class="lever"><div class="lever-icon grade">◉</div><div><strong>Recovery & grade</strong><p>More payable metal may improve economics, but recovery and grade are not the same.</p></div></div>
+          <a class="inline-link" href="#simulator">Test these levers <span>→</span></a>
+        </article>
+      </section>
+
+      <section class="section-heading simulator-heading" id="simulator">
+        <div><div class="eyebrow">02 / SCENARIO ENGINE</div><h2>Mine economics simulator</h2><p class="section-subtitle">Adjust the assumptions to model a simplified open-pit operation.</p></div>
+        <button class="secondary-button" id="resetBtn">↺ Reset assumptions</button>
+      </section>
+
+      <section class="simulator-layout">
+        <article class="panel controls-panel">
+          <div class="panel-heading"><div><div class="eyebrow">INPUT ASSUMPTIONS</div><h3>Build a scenario</h3></div><span class="mini-chip">EDITABLE</span></div>
+          <div class="input-group"><div class="input-label"><label for="price">Commodity selling price</label><output id="priceOut">$2,340 / oz</output></div><input id="price" type="range" min="1500" max="3200" step="10" value="2340"><div class="range-labels"><span>$1,500</span><span>$3,200 / oz</span></div></div>
+          <div class="input-group"><div class="input-label"><label for="production">Annual production</label><output id="productionOut">85,000 oz</output></div><input id="production" type="range" min="15000" max="150000" step="1000" value="85000"><div class="range-labels"><span>15k oz</span><span>150k oz</span></div></div>
+          <div class="input-group"><div class="input-label"><label for="cost">Operating cost</label><output id="costOut">$1,420 / oz</output></div><input id="cost" type="range" min="500" max="2500" step="10" value="1420"><div class="range-labels"><span>$500</span><span>$2,500 / oz</span></div></div>
+          <div class="input-group"><div class="input-label"><label for="capital">Annualized capital & other costs</label><output id="capitalOut">$28.0M</output></div><input id="capital" type="range" min="0" max="100" step="1" value="28"><div class="range-labels"><span>$0M</span><span>$100M</span></div></div>
+          <div class="assumption-note"><span>ⓘ</span> Simplified model: excludes taxes, royalties, financing, closure costs, and price hedging. This is for learning, not investment decisions.</div>
+        </article>
+        <article class="panel results-panel">
+          <div class="panel-heading"><div><div class="eyebrow">MODEL OUTPUT</div><h3>Scenario performance</h3></div><span class="status-pill" id="scenarioStatus">Positive margin</span></div>
+          <div class="result-main"><span>Estimated annual operating surplus</span><strong id="surplus">$50.2M</strong><small>Revenue − operating costs − annualized capital & other costs</small></div>
+          <div class="result-metrics">
+            <div class="metric"><span>Annual revenue</span><strong id="revenue">$198.9M</strong><small>Price × production</small></div>
+            <div class="metric"><span>Operating cost</span><strong id="operatingCost">$120.7M</strong><small>Unit cost × production</small></div>
+            <div class="metric"><span>Surplus margin</span><strong id="margin">25.2%</strong><small>Surplus / revenue</small></div>
+            <div class="metric"><span>Break-even price</span><strong id="breakeven">$2,008 / oz</strong><small>Cost coverage price</small></div>
+          </div>
+          <div class="waterfall">
+            <div class="waterfall-heading"><strong>Where the revenue goes</strong><span>Annual USD</span></div>
+            <div class="bar-row"><span>Operating costs</span><div class="bar-track"><div class="bar-fill cost-fill" id="costBar"></div></div><b id="costPct">60.7%</b></div>
+            <div class="bar-row"><span>Other costs</span><div class="bar-track"><div class="bar-fill other-fill" id="otherBar"></div></div><b id="otherPct">14.1%</b></div>
+            <div class="bar-row"><span>Surplus</span><div class="bar-track"><div class="bar-fill surplus-fill" id="surplusBar"></div></div><b id="surplusPct">25.2%</b></div>
+          </div>
+          <div class="model-footer"><span>MODEL ID: ORE-EDU-001</span><span>Assumptions update instantly</span></div>
+        </article>
+      </section>
+
+      <section class="section-heading risk-heading" id="risk">
+        <div><div class="eyebrow">03 / UNCERTAINTY</div><h2>Risk explorer</h2><p class="section-subtitle">See how price and cost changes can shift the modeled outcome.</p></div>
+      </section>
+      <section class="panel risk-panel">
+        <div class="risk-intro"><div><h3>Stress-test the scenario</h3><p>Choose a market shock and operating-cost change. The estimate updates from your current assumptions.</p></div><div class="risk-result"><span>STRESSED SURPLUS</span><strong id="stressSurplus">$50.2M</strong><small id="stressDelta">Baseline scenario</small></div></div>
+        <div class="risk-controls">
+          <div class="input-group"><div class="input-label"><label for="priceShock">Selling price change</label><output id="priceShockOut">−10%</output></div><input id="priceShock" type="range" min="-30" max="30" step="5" value="-10"><div class="range-labels"><span>−30%</span><span>+30%</span></div></div>
+          <div class="input-group"><div class="input-label"><label for="costShock">Operating cost change</label><output id="costShockOut">+10%</output></div><input id="costShock" type="range" min="-20" max="30" step="5" value="10"><div class="range-labels"><span>−20%</span><span>+30%</span></div></div>
+        </div>
+        <div class="risk-takeaway" id="riskTakeaway"><span class="takeaway-icon">↗</span><div><strong>Scenario takeaway</strong><p>Run a stress test to see how combined market and cost changes affect the annual surplus.</p></div></div>
+      </section>
+
+      <footer class="footer"><div class="footer-brand"><span class="brand-mark small-mark">O<span>+</span></span><span>ORELYTICS</span></div><p>Built as an educational project connecting data visualization, mining engineering, and economic modeling.</p><div class="footer-meta"><span>NO LIVE MARKET FEED</span><span>© 2026 ORELYTICS PROJECT</span></div></footer>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
