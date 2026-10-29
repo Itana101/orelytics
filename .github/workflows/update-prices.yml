@@ -1,1 +1,71 @@
 
+name: Update live commodity prices
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-prices:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch commodity prices
+        env:
+          OILPRICEAPI_KEY: ${{ secrets.OILPRICEAPI_KEY }}
+        run: |
+          python - <<'PY'
+          import os, json, urllib.request, datetime
+
+          key = os.environ.get("OILPRICEAPI_KEY")
+          if not key:
+              raise SystemExit("Missing OILPRICEAPI_KEY GitHub secret")
+
+          # Verify the API endpoint and response format against
+          # your provider's current API documentation before use.
+          url = "https://api.oilpriceapi.com/v1/prices/latest"
+          request = urllib.request.Request(
+              url,
+              headers={
+                  "Authorization": f"Token {key}",
+                  "Content-Type": "application/json"
+              }
+          )
+
+          with urllib.request.urlopen(request, timeout=30) as response:
+              payload = json.load(response)
+
+          os.makedirs("data", exist_ok=True)
+          output = {
+              "updated_at": datetime.datetime.now(
+                  datetime.timezone.utc
+              ).isoformat(),
+              "provider": "OilPriceAPI",
+              "raw_response": payload
+          }
+
+          with open("data/latest-prices.json", "w") as file:
+              json.dump(output, file, indent=2)
+
+          print("Fetched API response. Check its format before displaying prices.")
+          PY
+
+      - name: Commit updated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/latest-prices.json
+          git diff --cached --quiet || git commit -m "Update commodity market data"
+          git push
