@@ -17,7 +17,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Fetch latest commodity prices
+      - name: Fetch gold, copper and iron ore
         env:
           OILPRICEAPI_KEY: ${{ secrets.OILPRICEAPI_KEY }}
         run: |
@@ -25,40 +25,70 @@ jobs:
           import os
           import json
           import urllib.request
+          import urllib.parse
           from datetime import datetime, timezone
 
           key = os.environ.get("OILPRICEAPI_KEY")
           if not key:
-              raise SystemExit("Missing OILPRICEAPI_KEY GitHub secret")
+              raise SystemExit("Missing OILPRICEAPI_KEY secret")
 
-          url = "https://api.oilpriceapi.com/v1/prices/latest"
+          codes = "GOLD_USD,COPPER_USD,IRON_ORE_USD"
+          query = urllib.parse.urlencode({"by_code": codes})
+          url = "https://api.oilpriceapi.com/v1/prices/latest?" + query
 
-          request = urllib.request.Request(
+          req = urllib.request.Request(
               url,
-              headers={
-                  "Authorization": "Token " + key,
-                  "Accept": "application/json"
-              }
+              headers={"Authorization": "Token " + key,
+                       "Accept": "application/json"}
           )
 
-          with urllib.request.urlopen(request, timeout=30) as response:
+          with urllib.request.urlopen(req, timeout=30) as response:
               payload = json.load(response)
 
-          print("API response received.")
+          if payload.get("status") != "success":
+              raise SystemExit("API did not return success: " +
+                               json.dumps(payload))
 
-          # Keep the raw provider response so we can verify its
-          # exact structure before mapping prices to dashboard fields.
+          data = payload.get("data", {})
+          rows = data.get("prices", []) if isinstance(data, dict) else []
+
+          aliases = {
+              "GOLD_USD": "gold",
+              "COPPER_USD": "copper",
+              "IRON_ORE_USD": "iron_ore"
+          }
+
+          prices = {}
+          for row in rows:
+              code = row.get("code")
+              if code not in aliases:
+                  continue
+              prices[aliases[code]] = {
+                  "code": code,
+                  "price": row.get("price"),
+                  "currency": row.get("currency", "USD"),
+                  "unit": row.get("unit", "unknown"),
+                  "source": row.get("source", "OilPriceAPI"),
+                  "source_as_of": row.get("observed_at") or row.get("created_at"),
+                  "stale": row.get("stale", False),
+                  "data_status": row.get("data_status", "unknown")
+              }
+
+          missing = set(aliases.values()) - set(prices)
+          if missing:
+              raise SystemExit("Missing quotes: " + ", ".join(sorted(missing)))
+
           output = {
               "provider": "OilPriceAPI",
               "updated_at": datetime.now(timezone.utc).isoformat(),
-              "raw_response": payload
+              "prices": prices
           }
 
           os.makedirs("data", exist_ok=True)
-          with open("data/latest-prices.json", "w") as file:
-              json.dump(output, file, indent=2)
+          with open("data/latest-prices.json", "w") as f:
+              json.dump(output, f, indent=2)
 
-          print("Saved data/latest-prices.json")
+          print("Successfully saved all three commodity quotes.")
           PY
 
       - name: Commit updated data
@@ -67,8 +97,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/latest-prices.json
           if git diff --cached --quiet; then
-            echo "No changes to commit."
+            echo "No data changes to commit."
           else
-            git commit -m "Fetch latest commodity market data"
+            git commit -m "Update live commodity prices"
             git push
           fi
