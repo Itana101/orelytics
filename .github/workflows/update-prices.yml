@@ -1,5 +1,5 @@
 
-name: Update live commodity prices
+name: Update Orelytics Prices
 
 "on":
   workflow_dispatch:
@@ -14,91 +14,138 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
-      - name: Fetch gold, copper and iron ore
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+
+      - name: Fetch metal prices
         env:
           OILPRICEAPI_KEY: ${{ secrets.OILPRICEAPI_KEY }}
         run: |
-          python - <<'PY'
-          import os
-          import json
-          import urllib.request
-          import urllib.parse
-          from datetime import datetime, timezone
+          node <<'NODE'
+          const fs = require("fs");
 
-          key = os.environ.get("OILPRICEAPI_KEY")
-          if not key:
-              raise SystemExit("Missing OILPRICEAPI_KEY secret")
+          async function main() {
+            const codes = [
+              "GOLD_USD",
+              "COPPER_USD",
+              "IRON_ORE_USD"
+            ];
 
-          codes = "GOLD_USD,COPPER_USD,IRON_ORE_USD"
-          query = urllib.parse.urlencode({"by_code": codes})
-          url = "https://api.oilpriceapi.com/v1/prices/latest?" + query
+            if (!process.env.OILPRICEAPI_KEY) {
+              throw new Error("Missing GitHub secret: OILPRICEAPI_KEY");
+            }
 
-          req = urllib.request.Request(
-              url,
-              headers={"Authorization": "Token " + key,
-                       "Accept": "application/json"}
-          )
+            const url = new URL(
+              "https://api.oilpriceapi.com/v1/prices/latest"
+            );
+            url.searchParams.set("by_code", codes.join(","));
 
-          with urllib.request.urlopen(req, timeout=30) as response:
-              payload = json.load(response)
+            const response = await fetch(url, {
+              headers: {
+                Authorization: `Token ${process.env.OILPRICEAPI_KEY}`,
+                Accept: "application/json"
+              }
+            });
 
-          if payload.get("status") != "success":
-              raise SystemExit("API did not return success: " +
-                               json.dumps(payload))
+            const body = await response.json();
 
-          data = payload.get("data", {})
-          rows = data.get("prices", []) if isinstance(data, dict) else []
+            if (!response.ok || body.status !== "success") {
+              throw new Error(
+                `OilPriceAPI error (${response.status}): ${JSON.stringify(body)}`
+              );
+            }
 
-          aliases = {
-              "GOLD_USD": "gold",
-              "COPPER_USD": "copper",
-              "IRON_ORE_USD": "iron_ore"
-          }
+            const root = body.data || {};
+            const records = Array.isArray(root.prices)
+              ? root.prices
+              : Array.isArray(root)
+                ? root
+                : [root];
 
-          prices = {}
-          for row in rows:
-              code = row.get("code")
-              if code not in aliases:
-                  continue
-              prices[aliases[code]] = {
-                  "code": code,
-                  "price": row.get("price"),
-                  "currency": row.get("currency", "USD"),
-                  "unit": row.get("unit", "unknown"),
-                  "source": row.get("source", "OilPriceAPI"),
-                  "source_as_of": row.get("observed_at") or row.get("created_at"),
-                  "stale": row.get("stale", False),
-                  "data_status": row.get("data_status", "unknown")
+            const aliases = {
+              GOLD_USD: "gold",
+              COPPER_USD: "copper",
+              IRON_ORE_USD: "iron_ore"
+            };
+
+            const prices = {};
+
+            for (const record of records) {
+              const code = record.code || record.commodity_code;
+              const key = aliases[code];
+
+              if (!key) continue;
+
+              const price = Number(record.price);
+
+              if (!Number.isFinite(price)) {
+                throw new Error(`Invalid price for ${code}`);
               }
 
-          missing = set(aliases.values()) - set(prices)
-          if missing:
-              raise SystemExit("Missing quotes: " + ", ".join(sorted(missing)))
+              prices[key] = {
+                code,
+                price,
+                formatted: record.formatted || null,
+                currency: record.currency || "USD",
+                unit: record.unit || null,
+                source: record.source || null,
+                source_as_of:
+                  record.observed_at ||
+                  record.as_of ||
+                  record.updated_at ||
+                  record.created_at ||
+                  null,
+                stale: record.stale ?? null,
+                data_status: record.data_status || null,
+                synthetic: record.synthetic ?? null
+              };
+            }
 
-          output = {
-              "provider": "OilPriceAPI",
-              "updated_at": datetime.now(timezone.utc).isoformat(),
-              "prices": prices
+            const missing = Object.keys(aliases).filter(
+              code => !prices[aliases[code]]
+            );
+
+            if (missing.length) {
+              throw new Error(
+                `API did not return all requested metals. Missing: ${missing.join(", ")}. ` +
+                `Returned codes: ${records.map(r => r.code || r.commodity_code || "unknown").join(", ")}`
+              );
+            }
+
+            const output = {
+              provider: "OilPriceAPI",
+              updated_at: new Date().toISOString(),
+              prices
+            };
+
+            fs.mkdirSync("data", { recursive: true });
+            fs.writeFileSync(
+              "data/latest-prices.json",
+              JSON.stringify(output, null, 2) + "\n"
+            );
+
+            console.log(JSON.stringify(output, null, 2));
           }
 
-          os.makedirs("data", exist_ok=True)
-          with open("data/latest-prices.json", "w") as f:
-              json.dump(output, f, indent=2)
+          main().catch(error => {
+            console.error(error);
+            process.exit(1);
+          });
+          NODE
 
-          print("Successfully saved all three commodity quotes.")
-          PY
-
-      - name: Commit updated data
+      - name: Commit updated prices
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/latest-prices.json
           if git diff --cached --quiet; then
-            echo "No data changes to commit."
+            echo "No price changes to commit."
           else
-            git commit -m "Update live commodity prices"
+            git commit -m "Update live metal prices"
             git push
           fi
