@@ -6,9 +6,69 @@ name: Update live commodity prices
   schedule:
     - cron: "17 */6 * * *"
 
+permissions:
+  contents: write
+
 jobs:
-  test:
+  update-prices:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Verify workflow
-        run: echo "Commodity price workflow is running."
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Fetch latest commodity prices
+        env:
+          OILPRICEAPI_KEY: ${{ secrets.OILPRICEAPI_KEY }}
+        run: |
+          python - <<'PY'
+          import os
+          import json
+          import urllib.request
+          from datetime import datetime, timezone
+
+          key = os.environ.get("OILPRICEAPI_KEY")
+          if not key:
+              raise SystemExit("Missing OILPRICEAPI_KEY GitHub secret")
+
+          url = "https://api.oilpriceapi.com/v1/prices/latest"
+
+          request = urllib.request.Request(
+              url,
+              headers={
+                  "Authorization": "Token " + key,
+                  "Accept": "application/json"
+              }
+          )
+
+          with urllib.request.urlopen(request, timeout=30) as response:
+              payload = json.load(response)
+
+          print("API response received.")
+
+          # Keep the raw provider response so we can verify its
+          # exact structure before mapping prices to dashboard fields.
+          output = {
+              "provider": "OilPriceAPI",
+              "updated_at": datetime.now(timezone.utc).isoformat(),
+              "raw_response": payload
+          }
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/latest-prices.json", "w") as file:
+              json.dump(output, file, indent=2)
+
+          print("Saved data/latest-prices.json")
+          PY
+
+      - name: Commit updated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/latest-prices.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Fetch latest commodity market data"
+            git push
+          fi
