@@ -1,15 +1,15 @@
 {
   "provider": "OilPriceAPI",
-  "updated_at": "2026-11-01T05:58:34.075Z",
+  "updated_at": "2026-11-01T13:16:52.603Z",
   "prices": {
     "gold": {
       "code": "GOLD_USD",
-      "price": 3884.9,
-      "formatted": "$3884.90",
+      "price": 3875.36,
+      "formatted": "$3875.36",
       "currency": "USD",
       "unit": "troy_ounce",
       "source": "market_reporting",
-      "source_as_of": "2026-11-01T05:55:45.762Z",
+      "source_as_of": "2026-11-01T13:16:45.739Z",
       "stale": false,
       "data_status": "current",
       "synthetic": false
