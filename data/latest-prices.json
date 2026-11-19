@@ -1,27 +1,27 @@
 {
   "provider": "OilPriceAPI",
-  "updated_at": "2026-11-18T20:27:56.804Z",
+  "updated_at": "2026-11-19T07:20:22.971Z",
   "prices": {
     "gold": {
       "code": "GOLD_USD",
-      "price": 3726.71,
-      "formatted": "$3726.71",
+      "price": 3738.8,
+      "formatted": "$3738.80",
       "currency": "USD",
       "unit": "troy_ounce",
       "source": "market_reporting",
-      "source_as_of": "2026-11-18T20:16:47.282Z",
+      "source_as_of": "2026-11-19T07:16:33.839Z",
       "stale": false,
       "data_status": "current",
       "synthetic": false
     },
     "copper": {
       "code": "COPPER_USD",
-      "price": 5.99,
-      "formatted": "$5.99",
+      "price": 5.78,
+      "formatted": "$5.78",
       "currency": "USD",
       "unit": "lb",
       "source": "market_reporting",
-      "source_as_of": "2026-11-18T20:03:11.789Z",
+      "source_as_of": "2026-11-19T07:03:30.648Z",
       "stale": false,
       "data_status": "current",
       "synthetic": false
@@ -33,7 +33,7 @@
       "currency": "USD",
       "unit": "metric_ton",
       "source": "market_reporting",
-      "source_as_of": "2026-11-18T20:03:48.184Z",
+      "source_as_of": "2026-11-19T07:04:11.622Z",
       "stale": false,
       "data_status": "current",
       "synthetic": false
