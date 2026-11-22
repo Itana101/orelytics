@@ -1,6 +1,6 @@
 {
   "provider": "OilPriceAPI",
-  "updated_at": "2026-11-22T06:42:57.203Z",
+  "updated_at": "2026-11-22T19:33:48.349Z",
   "prices": {
     "gold": {
       "code": "GOLD_USD",
@@ -9,7 +9,7 @@
       "currency": "USD",
       "unit": "troy_ounce",
       "source": "market_reporting",
-      "source_as_of": "2026-11-22T06:40:46.121Z",
+      "source_as_of": "2026-11-22T19:28:58.030Z",
       "stale": false,
       "data_status": "current",
       "synthetic": false
@@ -21,7 +21,7 @@
       "currency": "USD",
       "unit": "lb",
       "source": "market_reporting",
-      "source_as_of": "2026-11-21T15:03:03.879Z",
+      "source_as_of": "2026-11-22T15:03:10.107Z",
       "stale": false,
       "data_status": "current",
       "synthetic": false
@@ -33,7 +33,7 @@
       "currency": "USD",
       "unit": "metric_ton",
       "source": "market_reporting",
-      "source_as_of": "2026-11-21T15:03:41.244Z",
+      "source_as_of": "2026-11-22T15:03:47.932Z",
       "stale": false,
       "data_status": "current",
       "synthetic": false
