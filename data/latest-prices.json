@@ -1,6 +1,6 @@
 {
   "provider": "OilPriceAPI",
-  "updated_at": "2026-11-27T21:13:19.319Z",
+  "updated_at": "2026-11-28T07:43:02.010Z",
   "prices": {
     "gold": {
       "code": "GOLD_USD",
@@ -9,33 +9,33 @@
       "currency": "USD",
       "unit": "troy_ounce",
       "source": "market_reporting",
-      "source_as_of": "2026-11-27T21:10:47.532Z",
+      "source_as_of": "2026-11-28T07:28:55.203Z",
       "stale": false,
       "data_status": "current",
       "synthetic": false
     },
     "copper": {
       "code": "COPPER_USD",
-      "price": 5.43,
-      "formatted": "$5.43",
+      "price": 5.58,
+      "formatted": "$5.58",
       "currency": "USD",
       "unit": "lb",
       "source": "market_reporting",
-      "source_as_of": "2026-11-27T20:33:34.170Z",
+      "source_as_of": "2026-11-27T23:03:18.968Z",
       "stale": false,
-      "data_status": "delayed",
+      "data_status": "current",
       "synthetic": false
     },
     "iron_ore": {
       "code": "IRON_ORE_USD",
-      "price": 90.64,
-      "formatted": "$90.64",
+      "price": 90.69,
+      "formatted": "$90.69",
       "currency": "USD",
       "unit": "metric_ton",
       "source": "market_reporting",
-      "source_as_of": "2026-11-27T20:34:12.665Z",
+      "source_as_of": "2026-11-27T23:03:58.089Z",
       "stale": false,
-      "data_status": "delayed",
+      "data_status": "current",
       "synthetic": false
     }
   }
